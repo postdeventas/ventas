@@ -196,17 +196,17 @@
 
         <div class="grid grid-cols-2 gap-3 text-center">
           <div class="bg-slate-800 p-3 rounded border border-slate-700">
-            <span class="block text-xs text-slate-400">Total Vendido</span>
+            <span class="block text-xs text-slate-400">Total Vendido Hoy</span>
             <span id="summary-total" class="text-lg font-bold text-emerald-400">$0.00</span>
           </div>
           <div class="bg-slate-800 p-3 rounded border border-slate-700">
-            <span class="block text-xs text-slate-400">N° Transacciones</span>
+            <span class="block text-xs text-slate-400">N° Tickets Hoy</span>
             <span id="summary-count" class="text-lg font-bold text-white">0</span>
           </div>
         </div>
 
         <div>
-          <h5 class="text-xs font-semibold text-slate-400 mb-2">Top Productos Vendidos:</h5>
+          <h5 class="text-xs font-semibold text-slate-400 mb-2">Top Productos Vendidos Hoy:</h5>
           <ul id="summary-top-products" class="text-xs space-y-1 bg-slate-800 p-3 rounded border border-slate-700 divide-y divide-slate-700/50">
           </ul>
         </div>
@@ -280,7 +280,7 @@
   <!-- Lógica JavaScript + Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDbNZ3Ie76U4D6_Q5qn9SYj6AnbFpGCgHE",
@@ -511,7 +511,7 @@
         total: total,
         cash: cash,
         change: cash - total,
-        timestamp: new Date()
+        timestamp: serverTimestamp()
       };
 
       await addDoc(collection(db, "ventas"), sale);
@@ -584,7 +584,6 @@
         </html>
       `;
 
-      // Se guarda automáticamente el ticket como imagen JPG al cobrar
       setTimeout(() => {
         downloadTicketJPG(sale.id);
       }, 100);
@@ -610,7 +609,6 @@
       }, 300);
     }
 
-    // Descarga la representación visual del ticket en formato JPG respetando el formato de 58mm
     function downloadTicketJPG(filename = currentSaleId || 'Ticket_Venta') {
       const element = document.getElementById('ticket-print-area');
       html2canvas(element, { 
@@ -718,7 +716,7 @@
       if (id) {
         await updateDoc(doc(db, "productos", id), { nombre, categoria, precio, stock });
       } else {
-        await addDoc(collection(db, "productos"), { nombre, categoria, precio, stock, fecha: new Date() });
+        await addDoc(collection(db, "productos"), { nombre, categoria, precio, stock, fecha: serverTimestamp() });
       }
 
       closeModal('modal-product');
@@ -749,27 +747,43 @@
       }
     }
 
+    // RESUMEN DEL DÍA: Filtra desde las 00:00:00 de hoy
     function openSummaryModal() {
       const modal = document.getElementById('modal-summary');
-      const todayStr = new Date().toLocaleDateString('es-SV');
+      const now = new Date();
+      const todayStr = now.toLocaleDateString('es-SV');
 
       document.getElementById('summary-date').textContent = todayStr;
 
-      let totalSales = 0;
-      let count = salesHistory.length;
+      // Calcular timestamp de medianoche (00:00:00.000 de hoy)
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+      let totalSalesToday = 0;
+      let countToday = 0;
       let productMap = {};
 
       salesHistory.forEach(s => {
-        totalSales += (s.total || 0);
-        if (s.items) {
-          s.items.forEach(item => {
-            productMap[item.name] = (productMap[item.name] || 0) + item.qty;
-          });
+        let saleTime = null;
+        if (s.timestamp && s.timestamp.toDate) {
+          saleTime = s.timestamp.toDate().getTime();
+        } else if (s.date) {
+          saleTime = new Date(s.date).getTime();
+        }
+
+        // Si la venta pertenece al día de hoy (desde las 00:00 hrs)
+        if (saleTime && saleTime >= startOfDay) {
+          totalSalesToday += (parseFloat(s.total) || 0);
+          countToday++;
+          if (s.items) {
+            s.items.forEach(item => {
+              productMap[item.name] = (productMap[item.name] || 0) + item.qty;
+            });
+          }
         }
       });
 
-      document.getElementById('summary-total').textContent = `$${totalSales.toFixed(2)}`;
-      document.getElementById('summary-count').textContent = count;
+      document.getElementById('summary-total').textContent = `$${totalSalesToday.toFixed(2)}`;
+      document.getElementById('summary-count').textContent = countToday;
 
       const topList = document.getElementById('summary-top-products');
       topList.innerHTML = '';
