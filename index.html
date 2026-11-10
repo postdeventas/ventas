@@ -43,14 +43,20 @@
         <p class="text-xs text-emerald-100">Sistema POS & Inventario | PT-210 Ready</p>
       </div>
     </div>
-    <div class="flex space-x-2 mt-2 sm:mt-0">
-      <button id="btn-tab-pos" class="bg-emerald-800 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-900 transition border border-emerald-500">
+    <div class="flex flex-wrap gap-2 mt-2 sm:mt-0">
+      <button id="btn-tab-pos" class="bg-emerald-800 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-emerald-900 transition border border-emerald-500">
         <i class="fa-solid fa-cart-shopping mr-1"></i> Caja / Ventas
       </button>
-      <button id="btn-tab-inventory" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-900 transition">
+      <button id="btn-tab-inventory" class="bg-emerald-600 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-emerald-900 transition">
         <i class="fa-solid fa-boxes-stacked mr-1"></i> Inventario
       </button>
-      <button id="btn-open-summary" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-900 transition">
+      <button id="btn-tab-out-of-stock" class="bg-emerald-600 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-emerald-900 transition">
+        <i class="fa-solid fa-triangle-exclamation mr-1"></i> Agotados
+      </button>
+      <button id="btn-tab-accounting" class="bg-emerald-600 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-emerald-900 transition">
+        <i class="fa-solid fa-file-invoice-dollar mr-1"></i> Contabilidad
+      </button>
+      <button id="btn-open-summary" class="bg-emerald-600 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-emerald-900 transition">
         <i class="fa-solid fa-chart-line mr-1"></i> Resumen Día
       </button>
     </div>
@@ -61,8 +67,6 @@
     
     <!-- POS Section -->
     <div id="view-pos" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      
-      <!-- Products List & Categories filter -->
       <div class="lg:col-span-2 space-y-4">
         <div class="flex flex-col sm:flex-row justify-between items-center gap-3 bg-slate-800 p-3 rounded-xl border border-slate-700">
           <div class="relative w-full sm:w-1/2">
@@ -88,11 +92,9 @@
           <button id="btn-clear-cart" class="text-xs text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i> Vaciar</button>
         </h2>
 
-        <!-- Cart Items List -->
         <div id="cart-items" class="flex-1 overflow-y-auto divide-y divide-slate-700 pr-1 space-y-2 my-2">
         </div>
 
-        <!-- Totals & Actions -->
         <div class="border-t border-slate-700 pt-3 space-y-3">
           <div class="space-y-1 text-sm">
             <div class="flex justify-between text-slate-400">
@@ -148,6 +150,117 @@
       </div>
 
       <div id="inventory-categories-container" class="space-y-6">
+      </div>
+    </div>
+
+    <!-- Out of Stock Section -->
+    <div id="view-out-of-stock" class="hidden space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-800 p-4 rounded-xl border border-slate-700">
+        <div>
+          <h2 class="text-lg font-bold text-red-400"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Productos Agotados (Stock en 0)</h2>
+          <p class="text-xs text-slate-400">Listado de artículos que requieren reabastecimiento.</p>
+        </div>
+        <button id="btn-export-out-jpg" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition flex items-center space-x-2">
+          <i class="fa-solid fa-image"></i>
+          <span>Descargar JPG de Agotados</span>
+        </button>
+      </div>
+
+      <div id="out-of-stock-card" class="bg-slate-800 rounded-xl border border-slate-700 p-4">
+        <div class="mb-4 pb-2 border-b border-slate-700 flex justify-between items-center">
+          <h3 class="font-bold text-emerald-400 text-sm">DESECHABLES BÁSICOS - REPORTE DE AGOTADOS</h3>
+          <span id="out-report-date" class="text-xs text-slate-400 font-mono">--/--/----</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-slate-900 text-[11px] uppercase text-slate-400 border-b border-slate-700">
+              <tr>
+                <th class="p-3">Categoría</th>
+                <th class="p-3">Producto</th>
+                <th class="p-3">Precio</th>
+                <th class="p-3 text-right">Stock</th>
+              </tr>
+            </thead>
+            <tbody id="out-of-stock-table-body" class="divide-y divide-slate-700/50">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accounting Section -->
+    <div id="view-accounting" class="hidden space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-800 p-4 rounded-xl border border-slate-700">
+        <div>
+          <h2 class="text-lg font-bold text-emerald-400"><i class="fa-solid fa-file-invoice-dollar mr-2"></i>Control Contable y Ganancias</h2>
+          <p class="text-xs text-slate-400">Reportes consolidados por semana (Lunes a Domingo) y por mes.</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Reporte Semanal -->
+        <div class="bg-slate-800 rounded-xl border border-slate-700 p-4 flex flex-col justify-between">
+          <div id="weekly-report-card" class="space-y-4">
+            <div class="pb-2 border-b border-slate-700 flex justify-between items-center">
+              <div>
+                <h3 class="font-bold text-emerald-400 text-sm">REPORTE SEMANAL</h3>
+                <p id="weekly-range-label" class="text-xs text-slate-400">Lunes a Domingo</p>
+              </div>
+              <span class="text-xs bg-slate-900 text-emerald-300 px-2 py-1 rounded font-mono" id="weekly-total-badge">$0.00</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm text-slate-300">
+                <thead class="bg-slate-900 text-[11px] uppercase text-slate-400 border-b border-slate-700">
+                  <tr>
+                    <th class="p-2.5">Día</th>
+                    <th class="p-2.5 text-center">Tickets</th>
+                    <th class="p-2.5 text-right">Ganancia / Total</th>
+                  </tr>
+                </thead>
+                <tbody id="weekly-table-body" class="divide-y divide-slate-700/50 text-xs">
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-700">
+            <button id="btn-export-weekly-jpg" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2.5 rounded transition flex items-center justify-center space-x-2">
+              <i class="fa-solid fa-image"></i>
+              <span>Descargar Reporte Semanal (JPG)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Reporte Mensual -->
+        <div class="bg-slate-800 rounded-xl border border-slate-700 p-4 flex flex-col justify-between">
+          <div id="monthly-report-card" class="space-y-4">
+            <div class="pb-2 border-b border-slate-700 flex justify-between items-center">
+              <div>
+                <h3 class="font-bold text-emerald-400 text-sm">REPORTE MENSUAL</h3>
+                <p id="monthly-name-label" class="text-xs text-slate-400">Mes Actual</p>
+              </div>
+              <span class="text-xs bg-slate-900 text-emerald-300 px-2 py-1 rounded font-mono" id="monthly-total-badge">$0.00</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm text-slate-300">
+                <thead class="bg-slate-900 text-[11px] uppercase text-slate-400 border-b border-slate-700">
+                  <tr>
+                    <th class="p-2.5">Semana / Rango</th>
+                    <th class="p-2.5 text-center">Tickets</th>
+                    <th class="p-2.5 text-right">Ganancia / Total</th>
+                  </tr>
+                </thead>
+                <tbody id="monthly-table-body" class="divide-y divide-slate-700/50 text-xs">
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-700">
+            <button id="btn-export-monthly-jpg" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2.5 rounded transition flex items-center justify-center space-x-2">
+              <i class="fa-solid fa-image"></i>
+              <span>Descargar Reporte Mensual (JPG)</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </main>
@@ -318,6 +431,7 @@
         } else {
           populateCategorySelects();
           renderInventoryTable();
+          renderOutOfStockTable();
         }
       });
 
@@ -328,6 +442,7 @@
         });
         renderPOSProducts();
         renderInventoryTable();
+        renderOutOfStockTable();
       });
 
       onSnapshot(collection(db, "ventas"), (snapshot) => {
@@ -335,6 +450,7 @@
         snapshot.forEach(docSnap => {
           salesHistory.push({ id: docSnap.id, ...docSnap.data() });
         });
+        renderAccountingReports();
       });
     }
 
@@ -626,9 +742,14 @@
       const container = document.getElementById('inventory-categories-container');
       container.innerHTML = '';
 
+      let hasVisibleCategories = false;
+
       categories.forEach(cat => {
         const catProducts = products.filter(p => p.categoria === cat.nombre);
         
+        if (catProducts.length === 0) return;
+
+        hasVisibleCategories = true;
         const card = document.createElement('div');
         card.className = 'bg-slate-800 rounded-xl border border-slate-700 overflow-hidden';
         card.innerHTML = `
@@ -649,7 +770,6 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-700/50">
-                ${catProducts.length === 0 ? '<tr><td colspan="4" class="p-3 text-xs text-slate-500 text-center">Sin productos en esta categoría.</td></tr>' : ''}
                 ${catProducts.map(p => `
                   <tr class="hover:bg-slate-750">
                     <td class="p-3 font-semibold text-white">${p.nombre}</td>
@@ -672,11 +792,193 @@
         container.appendChild(card);
       });
 
+      if (!hasVisibleCategories) {
+        container.innerHTML = '<p class="text-slate-500 text-center py-8">No hay categorías con productos registrados.</p>';
+      }
+
       container.querySelectorAll('.btn-edit-prod').forEach(b => {
         b.onclick = () => openProductModal(b.getAttribute('data-id'));
       });
       container.querySelectorAll('.btn-delete-prod').forEach(b => {
         b.onclick = () => deleteProduct(b.getAttribute('data-id'));
+      });
+    }
+
+    function renderOutOfStockTable() {
+      const tbody = document.getElementById('out-of-stock-table-body');
+      document.getElementById('out-report-date').textContent = new Date().toLocaleDateString('es-SV');
+      tbody.innerHTML = '';
+
+      const outProducts = products.filter(p => (parseInt(p.stock) || 0) <= 0);
+
+      if (outProducts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-xs text-slate-400 text-center">¡Excelente! No hay productos agotados actualmente.</td></tr>';
+        return;
+      }
+
+      outProducts.forEach(p => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-750">
+            <td class="p-3 text-xs text-slate-400 font-mono">${p.categoria || 'General'}</td>
+            <td class="p-3 font-semibold text-white">${p.nombre}</td>
+            <td class="p-3 font-bold text-emerald-400">$${(parseFloat(p.precio) || 0).toFixed(2)}</td>
+            <td class="p-3 text-right"><span class="bg-red-900/50 text-red-300 border border-red-700 px-2 py-0.5 rounded text-xs font-bold">0</span></td>
+          </tr>
+        `;
+      });
+    }
+
+    // CONTABILIDAD: Reportes Semanales (Lunes a Domingo) y Mensuales
+    function renderAccountingReports() {
+      const now = new Date();
+      
+      // --- REPORTE SEMANAL (Lunes a Domingo) ---
+      const currentDayOfWeek = now.getDay(); // 0 = Domingo, 1 = Lunes, etc.
+      const distanceToMonday = currentDayOfWeek === 0 ? -6 : 1 - currentDayOfWeek;
+      
+      const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + distanceToMonday);
+      monday.setHours(0, 0, 0, 0);
+      
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      sunday.setHours(23, 59, 59, 999);
+
+      document.getElementById('weekly-range-label').textContent = `${monday.toLocaleDateString('es-SV')} al ${sunday.toLocaleDateString('es-SV')}`;
+
+      const weeklyTable = document.getElementById('weekly-table-body');
+      weeklyTable.innerHTML = '';
+
+      const dayNames = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+      let weeklyTotal = 0;
+      let weeklyDaysData = [];
+
+      // Construir días de lunes(0) a domingo(6)
+      for (let i = 0; i < 7; i++) {
+        let d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        weeklyDaysData.push({
+          name: dayNames[i],
+          dateObj: d,
+          total: 0,
+          count: 0
+        });
+      }
+
+      salesHistory.forEach(s => {
+        let saleDate = null;
+        if (s.timestamp && s.timestamp.toDate) {
+          saleDate = s.timestamp.toDate();
+        } else if (s.date) {
+          saleDate = new Date(s.date);
+        }
+
+        if (saleDate && saleDate >= monday && saleDate <= sunday) {
+          weeklyTotal += (parseFloat(s.total) || 0);
+          
+          // Encontrar qué día de la semana corresponde
+          // Ajustar índice de getDay() (0=Domingo -> 6, 1=Lunes -> 0...)
+          let dayIndex = saleDate.getDay() === 0 ? 6 : saleDate.getDay() - 1;
+          if (weeklyDaysData[dayIndex]) {
+            weeklyDaysData[dayIndex].total += (parseFloat(s.total) || 0);
+            weeklyDaysData[dayIndex].count++;
+          }
+        }
+      });
+
+      document.getElementById('weekly-total-badge').textContent = `$${weeklyTotal.toFixed(2)}`;
+
+      weeklyDaysData.forEach(day => {
+        weeklyTable.innerHTML += `
+          <tr class="hover:bg-slate-750">
+            <td class="p-2.5 font-semibold text-white">${day.name} <span class="text-[10px] text-slate-400 block">${day.dateObj.toLocaleDateString('es-SV')}</span></td>
+            <td class="p-2.5 text-center text-slate-300">${day.count} tk</td>
+            <td class="p-2.5 text-right font-bold text-emerald-400">$${day.total.toFixed(2)}</td>
+          </tr>
+        `;
+      });
+
+
+      // --- REPORTE MENSUAL ---
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+      const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      
+      document.getElementById('monthly-name-label').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+      const monthlyTable = document.getElementById('monthly-table-body');
+      monthlyTable.innerHTML = '';
+
+      let monthlyTotal = 0;
+      let weeksMap = {};
+
+      salesHistory.forEach(s => {
+        let saleDate = null;
+        if (s.timestamp && s.timestamp.toDate) {
+          saleDate = s.timestamp.toDate();
+        } else if (s.date) {
+          saleDate = new Date(s.date);
+        }
+
+        if (saleDate && saleDate.getMonth() === currentMonth && saleDate.getFullYear() === currentYear) {
+          monthlyTotal += (parseFloat(s.total) || 0);
+
+          // Calcular número de semana del mes
+          let weekNum = Math.ceil(saleDate.getDate() / 7);
+          let weekKey = `Semana ${weekNum}`;
+
+          if (!weeksMap[weekKey]) {
+            weeksMap[weekKey] = { total: 0, count: 0 };
+          }
+          weeksMap[weekKey].total += (parseFloat(s.total) || 0);
+          weeksMap[weekKey].count++;
+        }
+      });
+
+      document.getElementById('monthly-total-badge').textContent = `$${monthlyTotal.toFixed(2)}`;
+
+      const sortedWeeks = Object.entries(weeksMap);
+      if (sortedWeeks.length === 0) {
+        monthlyTable.innerHTML = '<tr><td colspan="3" class="p-3 text-center text-slate-500">Sin registros este mes.</td></tr>';
+      } else {
+        sortedWeeks.forEach(([weekName, data]) => {
+          monthlyTable.innerHTML += `
+            <tr class="hover:bg-slate-750">
+              <td class="p-2.5 font-semibold text-white">${weekName}</td>
+              <td class="p-2.5 text-center text-slate-300">${data.count} tk</td>
+              <td class="p-2.5 text-right font-bold text-emerald-400">$${data.total.toFixed(2)}</td>
+            </tr>
+          `;
+        });
+      }
+    }
+
+    function exportWeeklyJPG() {
+      const element = document.getElementById('weekly-report-card');
+      html2canvas(element, { backgroundColor: '#1e293b', scale: 2 }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `Reporte_Semanal_${new Date().toISOString().slice(0,10)}.jpg`;
+        link.href = canvas.toDataURL('image/jpeg', 0.95);
+        link.click();
+      });
+    }
+
+    function exportMonthlyJPG() {
+      const element = document.getElementById('monthly-report-card');
+      html2canvas(element, { backgroundColor: '#1e293b', scale: 2 }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `Reporte_Mensual_${new Date().toISOString().slice(0,10)}.jpg`;
+        link.href = canvas.toDataURL('image/jpeg', 0.95);
+        link.click();
+      });
+    }
+
+    function exportOutOfStockJPG() {
+      const element = document.getElementById('out-of-stock-card');
+      html2canvas(element, { backgroundColor: '#1e293b', scale: 2 }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `Productos_Agotados_${new Date().toISOString().slice(0,10)}.jpg`;
+        link.href = canvas.toDataURL('image/jpeg', 0.95);
+        link.click();
       });
     }
 
@@ -747,14 +1049,12 @@
       }
     }
 
-    // RESUMEN DEL DÍA: Muestra TODOS los productos vendidos desde las 00:00:00 de hoy
     function openSummaryModal() {
       const modal = document.getElementById('modal-summary');
       const now = new Date();
       const todayStr = now.toLocaleDateString('es-SV');
 
       document.getElementById('summary-date').textContent = todayStr;
-
       const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
 
       let totalSalesToday = 0;
@@ -791,7 +1091,6 @@
       if (sortedProducts.length === 0) {
         topList.innerHTML = '<li class="text-slate-500 py-1 text-center">Sin ventas registradas hoy.</li>';
       } else {
-        // Se muestran TODOS los productos vendidos hoy sin restricciones de cantidad
         sortedProducts.forEach(([name, qty]) => {
           const li = document.createElement('li');
           li.className = 'flex justify-between py-1 px-1 text-slate-300';
@@ -821,18 +1120,25 @@
     }
 
     function setupEventListeners() {
-      document.getElementById('btn-tab-pos').onclick = () => {
-        document.getElementById('view-pos').classList.remove('hidden');
-        document.getElementById('view-inventory').classList.add('hidden');
-        document.getElementById('btn-tab-pos').className = 'bg-emerald-800 text-white px-4 py-2 rounded-lg text-sm font-semibold border border-emerald-500';
-        document.getElementById('btn-tab-inventory').className = 'bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-900';
-      };
-      document.getElementById('btn-tab-inventory').onclick = () => {
-        document.getElementById('view-pos').classList.add('hidden');
-        document.getElementById('view-inventory').classList.remove('hidden');
-        document.getElementById('btn-tab-inventory').className = 'bg-emerald-800 text-white px-4 py-2 rounded-lg text-sm font-semibold border border-emerald-500';
-        document.getElementById('btn-tab-pos').className = 'bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-900';
-      };
+      const tabs = [
+        { btn: 'btn-tab-pos', view: 'view-pos' },
+        { btn: 'btn-tab-inventory', view: 'view-inventory' },
+        { btn: 'btn-tab-out-of-stock', view: 'view-out-of-stock' },
+        { btn: 'btn-tab-accounting', view: 'view-accounting' }
+      ];
+
+      tabs.forEach(t => {
+        document.getElementById(t.btn).onclick = () => {
+          tabs.forEach(oth => {
+            document.getElementById(oth.view).classList.add('hidden');
+            document.getElementById(oth.btn).className = 'bg-emerald-600 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold hover:bg-emerald-900 transition';
+          });
+          document.getElementById(t.view).classList.remove('hidden');
+          document.getElementById(t.btn).className = 'bg-emerald-800 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold border border-emerald-500';
+          if (t.view === 'view-out-of-stock') renderOutOfStockTable();
+          if (t.view === 'view-accounting') renderAccountingReports();
+        };
+      });
 
       document.getElementById('search-input').oninput = renderPOSProducts;
       document.getElementById('category-filter').onchange = renderPOSProducts;
@@ -858,6 +1164,9 @@
       document.getElementById('btn-direct-print').onclick = directPrint;
       document.getElementById('btn-download-jpg').onclick = () => downloadTicketJPG();
       document.getElementById('btn-export-jpg').onclick = exportSummaryJPG;
+      document.getElementById('btn-export-out-jpg').onclick = exportOutOfStockJPG;
+      document.getElementById('btn-export-weekly-jpg').onclick = exportWeeklyJPG;
+      document.getElementById('btn-export-monthly-jpg').onclick = exportMonthlyJPG;
     }
   </script>
 </body>
